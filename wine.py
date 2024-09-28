@@ -32,6 +32,32 @@ def load_data():
     
     return data
 
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+
+local_css("style/style.css")
+
+# Load Animation
+animation_symbol = "❄"
+
+st.markdown(
+    f"""
+    <div class="snowflake">{animation_symbol}</div>
+    <div class="snowflake">{animation_symbol}</div>
+    <div class="snowflake">{animation_symbol}</div>
+    <div class="snowflake">{animation_symbol}</div>
+    <div class="snowflake">{animation_symbol}</div>
+    <div class="snowflake">{animation_symbol}</div>
+    <div class="snowflake">{animation_symbol}</div>
+    <div class="snowflake">{animation_symbol}</div>
+    <div class="snowflake">{animation_symbol}</div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
 # Function to build a neural network model
 def build_model(input_dim):
     model = Sequential()
@@ -43,7 +69,7 @@ def build_model(input_dim):
     return model
 
 # App title
-st.title("Wine Quality Detection !!!!")
+st.title("Wine Quality Detection !!")
 
 # Load data
 data = load_data()
@@ -132,3 +158,4 @@ if data is not None:
         st.error("This wine is predicted to be of **Bad Quality**.")
 else:
     st.error("Data could not be loaded.")
+
