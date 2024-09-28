@@ -158,4 +158,3 @@ if data is not None:
         st.error("This wine is predicted to be of **Bad Quality**.")
 else:
     st.error("Data could not be loaded.")
-
