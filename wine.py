@@ -8,6 +8,8 @@ from tensorflow.keras.models import Sequential # type: ignore
 from tensorflow.keras.layers import Dense # type: ignore
 import os
 import urllib.request
+import streamlit.components.v1 as components
+
 
 # Path where the local CSV file will be saved
 local_csv_path = "winequality-red.csv"
@@ -31,6 +33,8 @@ def load_data():
             return None
     
     return data
+
+
 
 def local_css(file_name):
     with open(file_name) as f:
@@ -56,6 +60,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 
 
 # Function to build a neural network model
@@ -99,9 +104,14 @@ if data is not None:
     # Train the model
     st.write("### Training the Deep Learning Model...")
     history = model.fit(X_train_scaled, y_train, epochs=20, batch_size=32, verbose=0, validation_data=(X_test_scaled, y_test))
+    with open("particle.html", "r") as f:
+            particle_html = f.read()
 
+# Embed the Particles.js animation in the background
+    components.html(particle_html, height=250, scrolling=False)
     # Display a message when the model is trained
     st.write("### Model Trained Successfully!")
+    
 
     # Evaluate the model on test data
     st.write("## Model Performance")
@@ -158,3 +168,4 @@ if data is not None:
         st.error("This wine is predicted to be of **Bad Quality**.")
 else:
     st.error("Data could not be loaded.")
+
