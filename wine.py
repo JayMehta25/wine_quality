@@ -43,7 +43,7 @@ def build_model(input_dim):
     return model
 
 # App title
-st.title("Wine Quality Classification using Deep Learning")
+st.title("Wine Quality Detection !!!!")
 
 # Load data
 data = load_data()
