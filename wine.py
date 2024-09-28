@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split # type: ignore
-from sklearn.ensemble import RandomForestClassifier # type: ignore
 from sklearn.metrics import classification_report, accuracy_score # type: ignore
 from sklearn.preprocessing import StandardScaler # type: ignore
+from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.layers import Dense # type: ignore
 import os
 import urllib.request
 
@@ -30,14 +32,18 @@ def load_data():
     
     return data
 
-# Function to train a model
-def train_model(X_train, y_train):
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
-    model.fit(X_train, y_train)
+# Function to build a neural network model
+def build_model(input_dim):
+    model = Sequential()
+    model.add(Dense(128, input_dim=input_dim, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))  # Output layer for binary classification
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
 # App title
-st.title("Wine Quality Classification")
+st.title("Wine Quality Classification using Deep Learning")
 
 # Load data
 data = load_data()
@@ -56,24 +62,28 @@ if data is not None:
     # Split into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-    # Standardize the features (important for some models)
+    # Standardize the features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
+    # Build the neural network model
+    model = build_model(X_train_scaled.shape[1])
+
     # Train the model
-    model = train_model(X_train_scaled, y_train)
+    st.write("### Training the Deep Learning Model...")
+    history = model.fit(X_train_scaled, y_train, epochs=20, batch_size=32, verbose=0, validation_data=(X_test_scaled, y_test))
 
     # Display a message when the model is trained
     st.write("### Model Trained Successfully!")
 
-    # Predict on test data
-    y_pred = model.predict(X_test_scaled)
-
-    # Show performance metrics
+    # Evaluate the model on test data
     st.write("## Model Performance")
-    accuracy = accuracy_score(y_test, y_pred)
+    loss, accuracy = model.evaluate(X_test_scaled, y_test, verbose=0)
     st.write(f"Accuracy: {accuracy:.4f}")
+
+    # Predict on test data
+    y_pred = (model.predict(X_test_scaled) > 0.5).astype(int)
 
     st.write("### Classification Report")
     st.text(classification_report(y_test, y_pred))
@@ -113,7 +123,7 @@ if data is not None:
     user_input_scaled = scaler.transform(user_input)
 
     # Make a prediction for the user input
-    prediction = model.predict(user_input_scaled)
+    prediction = (model.predict(user_input_scaled) > 0.5).astype(int)
 
     # Display prediction result in an alert message at the top of the app
     if prediction[0] == 1:
